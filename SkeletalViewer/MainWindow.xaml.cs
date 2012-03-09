@@ -33,6 +33,8 @@ namespace SkeletalViewer
 
         private void Window_Loaded(object sender, EventArgs e)
         {
+            this.WindowState = WindowState.Minimized;
+
             if (minKinectCount > 0)
             {
                 kinectRequiredOrEnabled.Text = "Requires Kinect";

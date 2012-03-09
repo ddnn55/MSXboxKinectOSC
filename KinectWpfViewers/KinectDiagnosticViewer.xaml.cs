@@ -237,6 +237,9 @@ namespace Microsoft.Samples.Kinect.WpfViewers
                     skeleton.Joints[joint.ID].Position.Y,
                     skeleton.Joints[joint.ID].Position.Z);
                 bundle.AddElement(element);
+
+                
+
             }
 
 			bundle.DateTime = DateTime.Now;
