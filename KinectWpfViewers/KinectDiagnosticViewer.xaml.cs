@@ -9,6 +9,8 @@ using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
 using KinectNui = Microsoft.Research.Kinect.Nui;
 
+using Ventuz.OSC;
+
 namespace Microsoft.Samples.Kinect.WpfViewers
 {
     /// <summary>
@@ -74,6 +76,8 @@ namespace Microsoft.Samples.Kinect.WpfViewers
         #region Init
         private void InitRuntime()
         {
+            udpWriter = new Ventuz.OSC.UdpWriter("127.0.0.1", 20000); // TODO configure in GUI
+
             //Some Runtimes' status will be NotPowered, or some other error state. Only want to Initialize the runtime, if it is connected.
             if (_Kinect.Status == KinectStatus.Connected)
             {
@@ -127,6 +131,9 @@ namespace Microsoft.Samples.Kinect.WpfViewers
             {
                 if (SkeletonTrackingState.Tracked == data.TrackingState)
                 {
+                    SendSkeletonOSC(data);
+
+
                     // Draw bones
                     Brush brush = brushes[iSkeleton % brushes.Length];
                     skeletonCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.Spine, JointID.ShoulderCenter, JointID.Head));
@@ -206,8 +213,28 @@ namespace Microsoft.Samples.Kinect.WpfViewers
         };
         #endregion Skeleton Processing
 
+        #region OSC
+        private void SendSkeletonOSC(SkeletonData skeleton)
+        {
+            Ventuz.OSC.OscElement left_hand = new Ventuz.OSC.OscElement("/skeleton/" + skeleton.UserIndex + "/hand_left/x", skeleton.Joints[JointID.HandLeft].Position.X);
+            Ventuz.OSC.OscElement right_hand = new Ventuz.OSC.OscElement("/skeleton/" + skeleton.UserIndex + "/hand_right/x", skeleton.Joints[JointID.HandRight].Position.X);
+            
+            Ventuz.OSC.OscBundle bundle = new Ventuz.OSC.OscBundle();
+            bundle.AddElement(left_hand);
+            bundle.AddElement(right_hand);
+
+            bundle.DateTime = DateTime.Now;
+
+            udpWriter.Send(bundle);
+
+            System.Console.WriteLine("sent bundle " + bundle.DateTime.ToString());
+            
+        }
+        #endregion
+
         #region Private State
         private KinectNui.Runtime _Kinect;
+        private Ventuz.OSC.UdpWriter udpWriter;
         #endregion Private State
     }
 }
