@@ -53,6 +53,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClickDetector.cs" />
     <Compile Include="InteropBitmapHelper.cs" />
     <Compile Include="KinectDepthViewer.xaml.cs">
       <DependentUpon>KinectDepthViewer.xaml</DependentUpon>
